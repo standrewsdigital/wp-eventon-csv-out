@@ -3,9 +3,6 @@
  * EventOn export to CSV
  */
 
-if(!is_user_logged_in()){
-  exit();
-}
 // output headers so that the file is downloaded rather than displayed
 header('Content-Type: text/csv; charset=utf-8');
 header('Content-Disposition: attachment; filename=deveventuofstaout.csv');
@@ -33,13 +30,13 @@ function html_process_content($content, $process = true){
 function cleanStr($str,$notText){
    // String utility object for string funcations
    $stringUtilObj   = new StringUtil;  
-   $clean = addslashes(trim($stringUtilObj->clean(stripslashes($str))));
+   $clean = trim($stringUtilObj->clean(stripslashes($str)));
    // strip out any remaining slashes 
-   $clean = str_replace ("\\\'","\'",$clean);
-   $clean = str_replace ("\\'","\'",$clean);
-   $clean = str_replace ("\\\'s","\'",$clean);
-   $clean = str_replace ("\\\\","\\",$clean);
-   $clean = preg_replace('/\\\\/', '\\',  $clean);
+   $clean = str_replace ("\\\'","'",$clean);
+   $clean = str_replace ("\\'","'",$clean);
+   $clean = str_replace ("\\\'s","'",$clean);
+   $clean = str_replace ("\\\\","",$clean);
+   $clean = preg_replace('/\\\\/', '',  $clean);
    $clean = str_replace("    ", "", $clean); 
   
    if ($notText){	
@@ -145,7 +142,8 @@ $dataOut[48] = 'cmd_5';
 $dataOut[49] = 'cmd_6';
 $dataOut[50] = 'cmd_7';
 $dataOut[51] = 'cmd_8';
-
+$dataOut[52] = 'post_author';
+$dataOut[53] = 'evoau_assignu';
 fputcsv($handle, $dataOut,',');
 
 
@@ -482,17 +480,19 @@ if (strlen(trim($organizer_term_id)) > 0 && is_numeric($organizer_term_id)  ){
     if ( $terms && ! is_wp_error( $terms ) ){
         $term_id = '';
       	foreach ( $terms as $term ) {
-      	   $term_id .= $term->term_id.',';
+           $t =  cleanStr(trim($term->term_id),true);
+      	   $term_id .= $t.',';
       	}
-      $dataOut[$startPos] = cleanStr(trim( $term_id),true);
+      $dataOut[$startPos] = $term_id;
   //         echo '<td>'.$dataOut[$startPos].'</td>';
       $startPos ++;
       // slug
       $slug ='';
   	 foreach ( $terms as $term ) {
-  		  $slug .= $term->slug.',';
+            $s = cleanStr(trim($term->slug),true);
+  	    $slug .= $s.',';
   	 }
-     $dataOut[$startPos] = cleanStr(trim($slug),true);
+     $dataOut[$startPos] = $slug;
   //        echo '<td>'.$dataOut[$startPos].'</td>';
     $startPos ++;
   
@@ -502,6 +502,8 @@ if (strlen(trim($organizer_term_id)) > 0 && is_numeric($organizer_term_id)  ){
     $startPos ++;
     $dataOut[$startPos] = $na;
   //  echo '<td>'.$dataOut[$startPos].'</td>';
+
+
     $startPos ++;
   }
 } // end foreach
@@ -517,12 +519,22 @@ if (strlen(trim($organizer_term_id)) > 0 && is_numeric($organizer_term_id)  ){
 	      $cut =  (!empty($pmv[$cmd_name_])?str_replace('"', "'", html_process_content($pmv[$cmd_name_][0], $process_html_content)):$na);
 		}
 		$dataOut[$startPos] = cleanStr(trim($cut),false);
-                                              //  echo '<td>'.$dataOut[$startPos].'</td>';
+                //  echo '<td>'.$dataOut[$startPos].'</td>';
 		$startPos ++;
 	}
 
+
 // echo "<td>$dataOutStatus";
 
+ $dataOut[53] =get_post_field( 'post_author',  $__id );
+
+// event_users
+$_assigned_users = wp_get_object_terms( $__id, 'event_users' );
+$_assigned_user = '';
+foreach ($_assigned_users as $_aUser){
+   $_assigned_user .= $_aUser->name.',';
+}
+$dataOut[54] = $_assigned_user;
 
 if($dataOutStatus == true){
    fputcsv($handle, $dataOut,',');

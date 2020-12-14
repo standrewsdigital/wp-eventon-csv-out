@@ -179,22 +179,22 @@ class StringUtil {
      */
     public function clean($string, $filter = FILTER_SANITIZE_STRING, $flags = FILTER_FLAG_ENCODE_LOW,$strict = false,$debug = false) {
 
-
-
-      // conver numeric values to 401
-     // $string = $this->entitiesToNumeric($string,true);
-
-
       $string = $this->convert_ascii(trim($string));
-
+        // decode any html elements
+        $string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
+        $string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
+        $string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
+        $string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
+        $string = htmlentities($string, ENT_QUOTES, 'UTF-8');
        //echo $string.'<br>'; 
        // Replace the trouble makers 
         $string = str_replace(',', "&#44;", $string);  
         $string = str_replace(',', "&#44;", $string);  
         $string = str_replace('’', "&#39;", $string);  
-$string = str_replace('‘', "&#39;", $string);  
-$string = str_replace('’', "&#39;", $string);  
-        $string = str_replace('’', "&#39;", $string);          
+        $string = str_replace('‘', "&#39;", $string);  
+        $string = str_replace('’', "&#39;", $string);  
+        $string = str_replace('’', "&#39;", $string);
+        $string = str_replace('&rsquo;', "&#039;", $string);
         $string = str_replace('’', "&#39;", $string);        
         $string = str_replace('’', "&#39;", $string);        
         $string = str_replace('‘', "&#39;", $string);        
@@ -209,30 +209,13 @@ $string = str_replace('’', "&#39;", $string);
         $string = str_replace('&aacute;', "&#225;", $string);
 
 
-if ($debug){
- echo '--'.$this->byteValue($string). '--';
-}
- // Convert string to UTF-8
-        $string = mb_convert_encoding($string, "UTF-8",mb_detect_encoding( $string));
-//echo $this->byteValue($string).'<br>';
+        // $string = mb_convert_encoding($string, "UTF-8",mb_detect_encoding( $string));
+        // $string = htmlentities($string, ENT_QUOTES, 'UTF-8');
+        $string = $this->entitiesToNumeric($string);
 
-
-
-
-//echo $this->byteValue($string).'<br>';
-
-      // echo $string.'<br>'; 
-
-        // conver numeric values to 401
-        $string = $this->entitiesToNumeric($string,true);
-
-        // decode any html elements
-        $string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
-        $string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
-        $string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
-        $string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
+  
         
-        $string = htmlentities($string, ENT_QUOTES, 'UTF-8');
+       
 
  return $string;
     }
@@ -892,7 +875,9 @@ if ($debug){
 	    '&permil;'   => '&#8240;', # per mille sign, U+2030 ISOtech
 	    '&lsaquo;'   => '&#8249;', # single left-pointing angle quotation mark, U+2039 ISO proposed
 	    '&rsaquo;'   => '&#8250;', # single right-pointing angle quotation mark, U+203A ISO proposed
+             '&rsquo;'   => '&#8250;', # single right-pointing angle quotation mark, U+203A ISO proposed
 	    '&euro;'     => '&#8364;', # euro sign, U+20AC NEW
+
 	);
 	if($reverse){
            return strtr($string,  array_flip($HTML401NamedToNumeric));
@@ -917,47 +902,6 @@ if ($debug){
 
 
 
-    /*
-      function after ($this, $inthat)
-      {
-      if (!is_bool(strpos($inthat, $this))){
-      return substr($inthat, strpos($inthat,$this)+strlen($this));
-      };
 
-      function after_last ($this, $inthat)
-      {
-      if (!is_bool(strrevpos($inthat, $this))){
-      return substr($inthat, strrevpos($inthat, $this)+strlen($this));
-      };
-
-      function before ($this, $inthat)
-      {
-      return substr($inthat, 0, strpos($inthat, $this));
-      };
-
-      function before_last ($this, $inthat)
-      {
-      return substr($inthat, 0, strrevpos($inthat, $this));
-      };
-
-      function between ($this, $that, $inthat)
-      {
-      return before ($that, after($this, $inthat));
-      };
-
-      function between_last ($this, $that, $inthat)
-      {
-      return after_last($this, before_last($that, $inthat));
-      };
-
-      // use strrevpos function in case your php version does not include it
-      function strrevpos($instr, $needle)
-      {
-      $rev_pos = strpos (strrev($instr), strrev($needle));
-      if ($rev_pos===false) return false;
-      else return strlen($instr) - $rev_pos - strlen($needle);
-      }
-      };
-     */
 }
 
